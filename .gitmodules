@@ -1,0 +1,3 @@
+[submodule "utestpp"]
+	path = utestpp
+	url = git@github.com:nibroc/utestpp.git

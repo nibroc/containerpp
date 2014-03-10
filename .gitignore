@@ -11,3 +11,13 @@
 *.lai
 *.la
 *.a
+
+# Meta files
+.depend
+
+# Compiled binaries
+utt
+test
+
+# IDE files
+nbproject/
