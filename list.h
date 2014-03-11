@@ -36,7 +36,7 @@ namespace cntr {
 			typedef riter<const_reference> const_reverse_iterator;
 			
 			explicit list(const Allocator& alloc = Allocator())
-			  : head_(value_type()), tail_(&head_), size_(), alloc_(alloc), node_alloc_()
+			  : head_(value_type()), tail_(&head_), size_(), alloc_(alloc)
 			{ }
 			
 			list(size_type count, const T& value, const Allocator& alloc = Allocator())
@@ -76,7 +76,7 @@ namespace cntr {
 			
 			list(list&& other)
 			  : head_(std::move(other.head_)), tail_(other.tail_), size_(other.size_), 
-				alloc_(std::move(other.alloc_)), node_alloc_(std::move(other.node_alloc_))
+				alloc_(std::move(other.alloc_))
 			{
 				// TODO: this is not required. Decide if the tiny performance hit
 				// is worth the easier testing/debugging.
@@ -172,7 +172,6 @@ namespace cntr {
 				swap(first.tail_, second.tail_);
 				swap(first.size_, second.size_);
 				swap(first.alloc_, second.alloc_);
-				swap(first.node_alloc_, second.node_alloc_);
 			}
 			
 			iterator begin()
@@ -314,9 +313,6 @@ namespace cntr {
 			Node* tail_;
 			size_type size_;
 			allocator_type alloc_;
-			
-			using node_allocator_type = typename std::allocator_traits<allocator_type>::template rebind_alloc<Node>;
-			node_allocator_type node_alloc_;
 			
 			void dispatch_ambiguous_constructor(size_type count, const T& value, std::true_type)
 			{
