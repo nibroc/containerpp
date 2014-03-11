@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <initializer_list>
 #include <iterator>
+#include <limits>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -35,6 +36,8 @@ namespace cntr {
 			typedef riter<const_reference> reverse_iterator;
 			typedef riter<const_reference> const_reverse_iterator;
 			
+			// -------------------- Constructors --------------------
+			
 			explicit list(const Allocator& alloc = Allocator())
 			  : head_(value_type()), tail_(&head_), size_(), alloc_(alloc)
 			{ }
@@ -61,9 +64,7 @@ namespace cntr {
 				// is numeric and not an actual iterator.
 				
 				using integral = typename std::is_integral<InputIt>::type;
-				
 				dispatch_ambiguous_constructor(first, last, integral());
-				
 			}
 			
 			list(const list& other)
@@ -90,6 +91,8 @@ namespace cntr {
 			  : list(std::begin(init), std::end(init), alloc)
 			{ }
 			
+			// -------------------- Assignment Operator --------------------
+			
 			list& operator=(const list& other)
 			{
 				swap(*this, list(other));
@@ -108,11 +111,97 @@ namespace cntr {
 				return *this;
 			}
 			
+			// -------------------- Capacity --------------------
+			
 			bool empty() const
 			{ return size_ == 0; }
 			
 			size_type size() const
 			{ return size_; }
+			
+			size_type max_size() const noexcept
+			{ return std::numeric_limits<size_type>::max(); }
+			
+			// -------------------- Allocator access --------------------
+			
+			allocator_type get_allocator() const
+			{
+				return alloc_;
+			}
+			
+			// -------------------- Assignment --------------------
+			
+			void assign( size_type count, const T& value );
+			
+			template< class InputIt >
+			void assign( InputIt first, InputIt last );
+			
+			void assign( std::initializer_list<T> ilist );
+			
+			// -------------------- Iterators --------------------
+			
+			iterator begin() noexcept
+			{ return iterator{&head_}; }
+			
+			const_iterator begin() const noexcept
+			{ return cbegin(); }
+			
+			const_iterator cbegin() const noexcept
+			{ return const_iterator{&head_}; }
+			
+			iterator end() noexcept
+			{ return iterator{tail_}; }
+			
+			const_iterator end() const noexcept
+			{ return cend(); }
+			
+			const_iterator cend() const noexcept
+			{ return const_iterator{tail_}; }
+			
+			reverse_iterator rbegin() noexcept
+			{ return reverse_iterator{tail_}; }
+			
+			const_reverse_iterator rbegin() const noexcept
+			{ return crbegin(); }
+			
+			const_reverse_iterator crbegin() const noexcept
+			{ return const_reverse_iterator{tail_}; }
+			
+			reverse_iterator rend() noexcept
+			{ return reverse_iterator{&head_}; }
+			
+			const_reverse_iterator rend() const noexcept
+			{ return crend(); }
+			
+			const_reverse_iterator crend() const noexcept
+			{ return const_reverse_iterator{&head_}; }
+			
+			// -------------------- Modifiers --------------------
+			
+			void clear()
+			{
+				head_->setNext(nullptr);
+				tail_ = nullptr;
+				size_ = 0;
+			}
+			
+			iterator insert(const_iterator pos, const T& value);
+
+			iterator insert(const_iterator pos, T&& value);
+
+			iterator insert(const_iterator pos, size_type count, const T& value);
+
+			template<class InputIt>
+			iterator insert(const_iterator pos, InputIt first, InputIt last);
+
+			iterator insert(const_iterator pos, std::initializer_list<T> ilist);
+			
+			template<class... Args> 
+			iterator emplace(const_iterator pos, Args&&... args);
+			
+			iterator erase(const_iterator pos);
+			
+			iterator erase(const_iterator first, const_iterator last);
 			
 			void push_back(const T& value)
 			{
@@ -129,14 +218,7 @@ namespace cntr {
 			}
 			
 			template<class... Args>
-			void emplace_back( Args&&... args );
-			
-			void clear()
-			{
-				head_->setNext(nullptr);
-				tail_ = nullptr;
-				size_ = 0;
-			}
+			void emplace_back(Args&&... args);
 			
 			void pop_back()
 			{
@@ -147,11 +229,39 @@ namespace cntr {
 				--size_;
 			}
 			
+			void push_front(const T& value);
+			
+			void push_front(T&& value);
+			
+			template<class... Args>
+			void emplace_front(Args&&... args);
+			
 			void pop_front()
 			{
 				head_.popFront();
 				--size_;
 			}
+			
+			void resize(size_type count);
+			
+			void resize(size_type count, const value_type& value);
+			
+			void swap(list& other)
+			{
+				using std::swap;
+				swap(*this, other);
+			}
+			
+			friend void swap(list& first, list& second) noexcept
+			{
+				using std::swap;
+				swap(first.head_, second.head_);
+				swap(first.tail_, second.tail_);
+				swap(first.size_, second.size_);
+				swap(first.alloc_, second.alloc_);
+			}
+			
+			// -------------------- Element Access --------------------
 			
 			reference front()
 			{ return head_.next()->value(); }
@@ -165,49 +275,7 @@ namespace cntr {
 			constexpr reference back() const
 			{ return tail_->value(); }
 			
-			friend void swap(list& first, list& second) noexcept
-			{
-				using std::swap;
-				swap(first.head_, second.head_);
-				swap(first.tail_, second.tail_);
-				swap(first.size_, second.size_);
-				swap(first.alloc_, second.alloc_);
-			}
-			
-			iterator begin()
-			{ return iterator{&head_}; }
-			
-			const_iterator begin() const
-			{  return const_iterator{&head_}; }
-			
-			const_iterator cbegin() const
-			{ return begin(); }
-			
-			iterator end()
-			{ return iterator{tail_}; }
-			
-			const_iterator end() const
-			{ return const_iterator{tail_}; }
-			
-			const_iterator cend() const
-			{ return const_iterator{tail_}; }
-			
-			reverse_iterator rbegin()
-			{ return reverse_iterator{tail_}; }
-			
-			const_reverse_iterator rbegin() const
-			{ return const_reverse_iterator{tail_}; }
-			
-			reverse_iterator rend()
-			{ return reverse_iterator{&head_}; }
-			
-			const_reverse_iterator rend() const
-			{ return const_reverse_iterator{&head_}; }
-			
-			allocator_type get_allocator() const
-			{
-				return alloc_;
-			}
+			// -------------------- Operations --------------------
 			
 		private:
 			
