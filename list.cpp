@@ -55,6 +55,12 @@ void testConstructors() {
 	UTESTPP_ASSERT_TRUE(iterator_cnt_array.empty());
 }
 
+void testFrontAndBack() {
+	cntr::list<int> l{1, 2, 3};
+	UTESTPP_ASSERT_EQUAL(l.front(), 1);
+	UTESTPP_ASSERT_EQUAL(l.back(), 3);
+}
+
 void testPush() {
 	cntr::list<int> l;
 	l.push_back(1);
@@ -181,6 +187,8 @@ int main() {
 	testEmpty();
 	
 	testConstructors();
+	
+	testFrontAndBack();
 	
 	testPush();
 	
