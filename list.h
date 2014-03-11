@@ -101,7 +101,8 @@ namespace cntr {
 			
 			list& operator=(list&& other)
 			{
-				std::swap(*this, list(std::forward(other)));
+				list l(std::forward<list>(other));
+				swap(l);
 				return *this;
 			}
 			
@@ -131,12 +132,31 @@ namespace cntr {
 			
 			// -------------------- Assignment --------------------
 			
-			void assign( size_type count, const T& value );
+			void dispatch_ambiguous_assign(size_type count, const T& value, std::true_type)
+			{
+				*this = list(count, value);
+			}
 			
-			template< class InputIt >
-			void assign( InputIt first, InputIt last );
+			template<typename Iter>
+			void dispatch_ambiguous_assign(Iter first, Iter last, std::false_type)
+			{
+				*this = list(first, last);
+			}
 			
-			void assign( std::initializer_list<T> ilist );
+			void assign(size_type count, const T& value)
+			{
+				dispatch_ambiguous_assign(count, value, std::true_type());
+			}
+			
+			template<class InputIt>
+			void assign(InputIt first, InputIt last)
+			{
+				using integral = typename std::is_integral<InputIt>::type;
+				dispatch_ambiguous_assign(first, last, integral());
+			}
+			
+			void assign(std::initializer_list<T> ilist)
+			{ assign(std::begin(ilist), std::end(ilist)); }
 			
 			// -------------------- Iterators --------------------
 			

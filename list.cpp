@@ -159,6 +159,22 @@ void testIteratorToConstIteratorConversion() {
 	UTESTPP_ASSERT_EQUAL(const_it, const_it_assign);
 }
 
+void testAssign() {
+	auto l = cntr::list<int>{1, 2, 3};
+	
+	l.assign(5, 3);
+	
+	UTESTPP_ASSERT_EQUAL(l.size(), 5);
+	UTESTPP_ASSERT_EQUAL(l.front(), 3);
+	UTESTPP_ASSERT_EQUAL(l.back(), 3);
+	
+	l.assign({1, 2, 3});
+	UTESTPP_ASSERT_EQUAL(l.size(), 3);
+	UTESTPP_ASSERT_EQUAL(l.front(), 1);
+	UTESTPP_ASSERT_EQUAL(l.back(), 3);
+	
+}
+
 int main() {
 	UTESTPP_INIT();
 	
@@ -180,6 +196,8 @@ int main() {
 	testMutationViaIterator();
 	
 	testIteratorToConstIteratorConversion();
+	
+	testAssign();
 	
 	return !UTESTPP_FINISH();
 }
