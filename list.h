@@ -269,16 +269,10 @@ namespace cntr {
 			void swap(list& other)
 			{
 				using std::swap;
-				swap(*this, other);
-			}
-			
-			friend void swap(list& first, list& second) noexcept
-			{
-				using std::swap;
-				swap(first.head_, second.head_);
-				swap(first.tail_, second.tail_);
-				swap(first.size_, second.size_);
-				swap(first.alloc_, second.alloc_);
+				swap(head_, other.head_);
+				swap(tail_, other.tail_);
+				swap(size_, other.size_);
+				swap(alloc_, other.alloc_);
 			}
 			
 			// -------------------- Element Access --------------------
@@ -297,6 +291,45 @@ namespace cntr {
 			
 			// -------------------- Operations --------------------
 			
+			void merge(list& other);
+			
+			void merge(list&& other);
+			
+			template<class Compare>
+			void merge(list& other, Compare comp);
+			
+			template<class Compare>
+			void merge(list&& other, Compare comp);
+			
+			void splice(const_iterator pos, list& other);
+
+			void splice(const_iterator pos, list&& other);
+
+			void splice(const_iterator pos, list& other, const_iterator it);
+
+			void splice(const_iterator pos, list&& other, const_iterator it);
+
+			void splice(const_iterator pos, list& other, const_iterator first, const_iterator last);
+
+			void splice(const_iterator pos, list&& other, const_iterator first, const_iterator last);
+			
+			void remove(const T& value);
+	
+			template<class UnaryPredicate>
+			void remove_if(UnaryPredicate p);
+			
+			void reverse();
+			
+			void unique();
+
+			template<class BinaryPredicate>
+			void unique(BinaryPredicate p);
+			
+			void sort();
+			
+			template<class Compare> 
+			void sort(Compare comp);
+		
 		private:
 			
 			class Node {
@@ -498,10 +531,35 @@ namespace cntr {
 					return *this;
 				}
 			
-			};
-			
+			};		
 	};
 
+	template<class T, class Alloc>
+	bool operator==(const list<T,Alloc>& lhs, const list<T,Alloc>& rhs);
+
+	template<class T, class Alloc>
+	bool operator!=(const list<T,Alloc>& lhs, const list<T,Alloc>& rhs);
+
+	template<class T, class Alloc>
+	bool operator<(const list<T,Alloc>& lhs, const list<T,Alloc>& rhs);
+
+	template<class T, class Alloc>
+	bool operator<=(const list<T,Alloc>& lhs, const list<T,Alloc>& rhs);
+
+	template<class T, class Alloc>
+	bool operator>(const list<T,Alloc>& lhs, const list<T,Alloc>& rhs);
+
+	template<class T, class Alloc>
+	bool operator>=(const list<T,Alloc>& lhs, const list<T,Alloc>& rhs);
+	
+}
+
+namespace std {
+	template<class T, class Alloc>
+	void swap(cntr::list<T,Alloc>& lhs, cntr::list<T,Alloc>& rhs) noexcept
+	{
+		lhs.swap(rhs);
+	}
 }
 
 #endif
